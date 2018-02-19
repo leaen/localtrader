@@ -60,3 +60,8 @@ class TestOrder(unittest.TestCase):
         high_order = Order(11.00, 1, Side.SELL, 123)
 
         self.assertTrue(low_order < high_order, 'Sell orders with lowest price come first')
+
+        high_order = Order(11.00, 1, Side.SELL, 123)
+        low_order = Order(10.00, 1, Side.SELL, 123)
+
+        self.assertTrue(low_order < high_order, 'Sell orders with lowest price come first, time is second')
