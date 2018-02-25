@@ -8,16 +8,16 @@ class TestOrder(unittest.TestCase):
     def test_invalid_side(self):
         # Try making an order with side of 0
         with self.assertRaises(ValueError):
-            o = Order(-10.00, 5, 0, 123)
+            o = Order(10.00, 5, 0, 123)
 
         # Try making an order with side of 'BUY'
         with self.assertRaises(ValueError):
-            o = Order(-10.00, 5, 'BUY', 123)
+            o = Order(10.00, 5, 'BUY', 123)
 
     def test_invalid_client_id(self):
         # Try making an order with client_id 'abc'
         with self.assertRaises(ValueError):
-            o = Order(-10.00, 5, Side.BUY, 'abc')
+            o = Order(10.00, 5, Side.BUY, 'abc')
 
     def test_negative_price(self):
         # Try making an order at price of -10.00
