@@ -1,6 +1,13 @@
 import time
+from enum import Enum
 
 from .side import Side
+
+
+class OrderStatus(Enum):
+    ACTIVE = 0
+    FILLED = 1
+    CANCELLED = 1
 
 
 class Order:
@@ -34,6 +41,7 @@ class Order:
         self.size = size
         self.side = side
         self.client_id = client_id
+        self.status = OrderStatus.ACTIVE
 
         # Uses the system time with ms accuracy
         self.order_time = time.time()
@@ -65,3 +73,15 @@ class Order:
                 return self.price < other.price
 
         return self.order_time < other.order_time
+
+    def set_status(self, status):
+        if not isinstance(status, OrderStatus):
+            raise ValueError('Status must be of type OrderStatus')
+
+        self.status = status
+
+    def get_status(self):
+        return self.status
+
+    def cancel(self):
+        self.status = OrderStatus.CANCELLED

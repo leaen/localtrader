@@ -1,10 +1,24 @@
 import unittest
 
 from localtrader.side import Side
-from localtrader.order import Order
+from localtrader.order import Order, OrderStatus
 
 
 class TestOrder(unittest.TestCase):
+    def test_order_status(self):
+        """
+        Order status should be OrderStatus.ACTIVE when the order is first
+            created, then change to OrderStatus.FILLED if the order is
+            successfully matched, or OrderStatus.CANCELLED if cancelled.
+        """
+        o = Order(50.00, 2, Side.BUY, 123)
+
+        self.assertEqual(o.get_status(), OrderStatus.ACTIVE)
+
+        o.cancel()
+
+        self.assertEqual(o.get_status(), OrderStatus.CANCELLED)
+
     def test_invalid_side(self):
         # Try making an order with side of 0
         with self.assertRaises(ValueError):
