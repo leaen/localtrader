@@ -24,18 +24,18 @@ class TestOrderbook(unittest.TestCase):
         book.cancel_order(o2.order_id)
         self.assertEqual(book.best_offer(), 10.00)
 
-    def test_best_ask(self):
+    def test_best_offer(self):
         # Orderbook for ABC
         book = Orderbook('ABC')
         bob = Client('Bob')
 
         o1 = Order(10.00, 1, Side.SELL, bob.client_id)
         book.submit_order(o1)
-        self.assertEqual(book.best_ask(), 10.00)
+        self.assertEqual(book.best_offer(), 10.00)
 
         o2 = Order(11.00, 1, Side.SELL, bob.client_id)
         book.submit_order(o2)
-        self.assertEqual(book.best_ask(), 10.00)
+        self.assertEqual(book.best_offer(), 10.00)
 
         # Cancelling the first order should bring the best ask up to 11.00
         book.cancel_order(o1.order_id)
