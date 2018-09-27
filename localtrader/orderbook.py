@@ -4,6 +4,9 @@ from .order import Order, OrderStatus
 from .side import Side
 from .trade import Trade
 
+class RejectedOrder(Exception):
+    pass
+
 class NoBidsException(Exception):
     pass
 
@@ -33,6 +36,9 @@ class Orderbook:
 
         assert isinstance(order, Order), \
             'order must be of type Order instead have {}'.format(type(order))
+
+        if order.instrument != self.instrument:
+            raise RejectedOrder(f"Order is for instrument {order.instrument} but book is for {self.instrument}")
 
         # Add order into the order pool
         self.orders[order.order_id] = order

@@ -3,7 +3,7 @@ import unittest
 from localtrader.side import Side
 from localtrader.order import Order, OrderStatus
 from localtrader.client import Client
-from localtrader.orderbook import Orderbook
+from localtrader.orderbook import Orderbook, RejectedOrder
 
 
 class TestOrderbook(unittest.TestCase):
@@ -181,3 +181,12 @@ class TestOrderbook(unittest.TestCase):
         self.assertEqual(len(eve_fills), 0)
 
         self.assertFalse(book.is_matched())
+
+    def test_reject_order(self):
+        book = Orderbook('ABC')
+
+        bob = Client('Bob')
+
+        # Should not be able to submit an order for another instrument
+        with self.assertRaises(RejectedOrder):
+            book.submit_order(Order("CBA", 9.00, 2, Side.BUY, bob.client_id))
