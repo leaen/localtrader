@@ -114,3 +114,28 @@ class Order:
             self.status = OrderStatus.FILLED
         elif 0 < self.size < self.total_size:
             self.status = OrderStatus.PARTIALLY_FILLED
+
+    @staticmethod
+    def serialize(o):
+        side = "BUY" if o.side == Side.BUY else "SELL"
+        return f"o|{o.price:.4f}|{o.size}|{side}|{o.client_id}"
+
+    @staticmethod
+    def deserialize(o_serialized):
+        sections = o_serialized.split('|')
+
+        if sections[0] != 'o':
+            raise ValueError("Mismatched message type. '{o_serialized}' does not appear to be an order.")
+
+        try:
+            price = float(sections[1])
+            size = int(sections[2])
+            side = sections[3]
+            if side not in ["BUY", "SELL"]:
+                raise ValueError()
+            side = Side.BUY if side == "BUY" else Side.SELL
+            client_id = int(sections[4])
+        except ValueError as e:
+            raise ValueError(f"Failed to deserialize order message '{o_serialized}'.")
+
+        return Order(price, size, side, client_id)

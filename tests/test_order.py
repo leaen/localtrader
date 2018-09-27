@@ -78,4 +78,33 @@ class TestOrder(unittest.TestCase):
         high_order = Order(11.00, 1, Side.SELL, 123)
         low_order = Order(10.00, 1, Side.SELL, 123)
 
-        self.assertTrue(low_order < high_order, 'Sell orders with lowest price come first, time is second')
+        self.assertTrue(low_order < high_order, 'Sell orders with lowest price come first, time second')
+
+    def test_serialize_order(self):
+        o = Order(10.00, 10, Side.BUY, 123)
+        o_serialized = Order.serialize(o)
+
+        self.assertEqual(o_serialized, "o|10.0000|10|BUY|123")
+
+        o = Order(12.333, 432, Side.SELL, 4242)
+        o_serialized = Order.serialize(o)
+
+        self.assertEqual(o_serialized, "o|12.3330|432|SELL|4242")
+
+    def test_deserialize_order(self):
+        o_serialized = "o|10.0000|10|BUY|123"
+        o = Order.deserialize(o_serialized)
+
+        self.assertEqual(o.price, 10.00)
+        self.assertEqual(o.size, 10)
+        self.assertEqual(o.side, Side.BUY)
+        self.assertEqual(o.client_id, 123)
+
+        o_serialized = "o|12.3330|432|SELL|4242"
+
+        o = Order.deserialize(o_serialized)
+
+        self.assertEqual(o.price, 12.333)
+        self.assertEqual(o.size, 432)
+        self.assertEqual(o.side, Side.SELL)
+        self.assertEqual(o.client_id, 4242)
