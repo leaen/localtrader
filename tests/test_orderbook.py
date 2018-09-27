@@ -12,11 +12,11 @@ class TestOrderbook(unittest.TestCase):
         book = Orderbook('ABC')
         bob = Client('Bob')
 
-        o1 = Order(10.00, 1, Side.BUY, bob.client_id)
+        o1 = Order("ABC", 10.00, 1, Side.BUY, bob.client_id)
         book.submit_order(o1)
         self.assertEqual(book.best_offer(), 10.00)
 
-        o2 = Order(11.00, 1, Side.BUY, bob.client_id)
+        o2 = Order("ABC", 11.00, 1, Side.BUY, bob.client_id)
         book.submit_order(o2)
         self.assertEqual(book.best_offer(), 11.00)
 
@@ -29,11 +29,11 @@ class TestOrderbook(unittest.TestCase):
         book = Orderbook('ABC')
         bob = Client('Bob')
 
-        o1 = Order(10.00, 1, Side.SELL, bob.client_id)
+        o1 = Order("ABC", 10.00, 1, Side.SELL, bob.client_id)
         book.submit_order(o1)
         self.assertEqual(book.best_offer(), 10.00)
 
-        o2 = Order(11.00, 1, Side.SELL, bob.client_id)
+        o2 = Order("ABC", 11.00, 1, Side.SELL, bob.client_id)
         book.submit_order(o2)
         self.assertEqual(book.best_offer(), 10.00)
 
@@ -46,7 +46,7 @@ class TestOrderbook(unittest.TestCase):
         book = Orderbook('ABC')
         bob = Client('Bob')
 
-        o1 = Order(10.00, 1, Side.BUY, bob.client_id)
+        o1 = Order("ABC", 10.00, 1, Side.BUY, bob.client_id)
         book.submit_order(o1)
         self.assertEqual(book.get_order_status(o1.order_id), OrderStatus.ACTIVE)
         book.cancel_order(o1.order_id)
@@ -60,8 +60,8 @@ class TestOrderbook(unittest.TestCase):
         alice = Client('Alice')
 
         # Bob buys at 10, Alice sells at 10
-        book.submit_order(Order(10.00, 1, Side.BUY, bob.client_id))
-        book.submit_order(Order(10.00, 1, Side.SELL, alice.client_id))
+        book.submit_order(Order("ABC", 10.00, 1, Side.BUY, bob.client_id))
+        book.submit_order(Order("ABC", 10.00, 1, Side.SELL, alice.client_id))
 
         # Check that the orders were matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)
@@ -89,9 +89,9 @@ class TestOrderbook(unittest.TestCase):
         eve = Client('Eve')
 
         # Bob buys at 10, Alice sells at 10, Eve tries to sell at 10 as well
-        book.submit_order(Order(10.00, 1, Side.BUY, bob.client_id))
-        book.submit_order(Order(10.00, 1, Side.SELL, alice.client_id))
-        book.submit_order(Order(10.00, 1, Side.SELL, eve.client_id))
+        book.submit_order(Order("ABC", 10.00, 1, Side.BUY, bob.client_id))
+        book.submit_order(Order("ABC", 10.00, 1, Side.SELL, alice.client_id))
+        book.submit_order(Order("ABC", 10.00, 1, Side.SELL, eve.client_id))
 
         # Check that the orders were matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)
@@ -124,9 +124,9 @@ class TestOrderbook(unittest.TestCase):
         eve = Client('Eve')
 
         # Bob buys 2 at 10, Alice sells at 10, Eve tries to sell at 10 as well
-        t1 = book.submit_order(Order(10.00, 2, Side.BUY, bob.client_id))
-        t2 = book.submit_order(Order(10.00, 1, Side.SELL, alice.client_id))
-        t3 = book.submit_order(Order(10.00, 1, Side.SELL, eve.client_id))
+        t1 = book.submit_order(Order("ABC", 10.00, 2, Side.BUY, bob.client_id))
+        t2 = book.submit_order(Order("ABC", 10.00, 1, Side.SELL, alice.client_id))
+        t3 = book.submit_order(Order("ABC", 10.00, 1, Side.SELL, eve.client_id))
 
         # Check that the orders were matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)
@@ -165,11 +165,11 @@ class TestOrderbook(unittest.TestCase):
         eve = Client('Eve')
 
         # Bob offers @ 9, alice asks @ 10, bob cancels then eve asks @ 8.5
-        bob_order = Order(9.00, 2, Side.BUY, bob.client_id)
+        bob_order = Order("ABC", 9.00, 2, Side.BUY, bob.client_id)
         book.submit_order(bob_order)
-        book.submit_order(Order(10.00, 1, Side.SELL, alice.client_id))
+        book.submit_order(Order("ABC", 10.00, 1, Side.SELL, alice.client_id))
         book.cancel_order(bob_order.order_id)
-        book.submit_order(Order(8.50, 1, Side.SELL, eve.client_id))
+        book.submit_order(Order("ABC", 8.50, 1, Side.SELL, eve.client_id))
 
         # Check that the orders weren't matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)

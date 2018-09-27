@@ -12,8 +12,9 @@ class OrderStatus(Enum):
 
 
 class Order:
-    def __init__(self, price, size, side, client_id):
+    def __init__(self, instrument, price, size, side, client_id):
         """
+        instrument: the instrument of interest
         price: the execution price of the order
         size: the volume of the order
         side: whether the order is a BUY or SELL order
@@ -38,6 +39,7 @@ class Order:
         if not isinstance(side, Side):
             raise ValueError('Order side must be Side.BUY or Side.SELL')
 
+        self.instrument = instrument
         self.price = price
         self.total_size = size
         self.size = size
@@ -118,7 +120,7 @@ class Order:
     @staticmethod
     def serialize(o):
         side = "BUY" if o.side == Side.BUY else "SELL"
-        return f"o|{o.price:.4f}|{o.size}|{side}|{o.client_id}"
+        return f"o|{o.instrument}|{o.price:.4f}|{o.size}|{side}|{o.client_id}"
 
     @staticmethod
     def deserialize(o_serialized):
@@ -128,14 +130,15 @@ class Order:
             raise ValueError("Mismatched message type. '{o_serialized}' does not appear to be an order.")
 
         try:
-            price = float(sections[1])
-            size = int(sections[2])
-            side = sections[3]
+            instrument = sections[1]
+            price = float(sections[2])
+            size = int(sections[3])
+            side = sections[4]
             if side not in ["BUY", "SELL"]:
                 raise ValueError()
             side = Side.BUY if side == "BUY" else Side.SELL
-            client_id = int(sections[4])
+            client_id = int(sections[5])
         except ValueError as e:
             raise ValueError(f"Failed to deserialize order message '{o_serialized}'.")
 
-        return Order(price, size, side, client_id)
+        return Order(instrument, price, size, side, client_id)
