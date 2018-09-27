@@ -11,6 +11,7 @@ class Trade:
 
         # TODO Sanitisation
 
+        self.instrument = instrument
         self.price = price
         self.size = size
         self.side = side

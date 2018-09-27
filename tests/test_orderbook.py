@@ -73,11 +73,11 @@ class TestOrderbook(unittest.TestCase):
         # Check that the fills are correctly recorded
         bob_fill = bob_fills[0]
         alice_fill = bob_fills[0]
-        self.assertEqual(bob_fill['maker'], bob.client_id)
-        self.assertEqual(bob_fill['taker'], alice.client_id)
-        self.assertEqual(bob_fill['size'], 1)
-        self.assertEqual(bob_fill['side'], Side.SELL)
-        self.assertEqual(bob_fill['instrument'], 'ABC')
+        self.assertEqual(bob_fill.maker, bob.client_id)
+        self.assertEqual(bob_fill.taker, alice.client_id)
+        self.assertEqual(bob_fill.size, 1)
+        self.assertEqual(bob_fill.side, Side.SELL)
+        self.assertEqual(bob_fill.instrument, 'ABC')
         self.assertEqual(bob_fill, alice_fill)
 
     def test_price_time_priority(self):
@@ -96,7 +96,7 @@ class TestOrderbook(unittest.TestCase):
         # Check that the orders were matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)
         alice_fills = book.get_filled_by_client_id(alice.client_id)
-        eve_fills = book.get_filled_by_client_id(alice.client_id)
+        eve_fills = book.get_filled_by_client_id(eve.client_id)
 
         self.assertEqual(len(bob_fills), 1)
         self.assertEqual(len(alice_fills), 1)
@@ -105,15 +105,15 @@ class TestOrderbook(unittest.TestCase):
         # Check that the fills are correctly recorded
         bob_fill = bob_fills[0]
         alice_fill = bob_fills[0]
-        self.assertEqual(bob_fill['maker'], bob.client_id)
-        self.assertEqual(bob_fill['taker'], alice.client_id)
-        self.assertEqual(bob_fill['size'], 1)
-        self.assertEqual(bob_fill['side'], Side.SELL)
-        self.assertEqual(bob_fill['instrument'], 'ABC')
+        self.assertEqual(bob_fill.maker, bob.client_id)
+        self.assertEqual(bob_fill.taker, alice.client_id)
+        self.assertEqual(bob_fill.size, 1)
+        self.assertEqual(bob_fill.side, Side.SELL)
+        self.assertEqual(bob_fill.instrument, 'ABC')
         self.assertEqual(bob_fill, alice_fill)
 
         # Check that Eve's order is still on the book
-        self.assertEqual(book.get_orders_by_client_id(eve.client_id), 1)
+        self.assertEqual(len(book.get_orders_by_client_id(eve.client_id)), 1)
 
     def test_split_orders(self):
         # Orderbook for ABC
@@ -124,9 +124,9 @@ class TestOrderbook(unittest.TestCase):
         eve = Client('Eve')
 
         # Bob buys 2 at 10, Alice sells at 10, Eve tries to sell at 10 as well
-        book.submit_order(Order(10.00, 2, Side.BUY, bob.client_id))
-        book.submit_order(Order(10.00, 1, Side.SELL, alice.client_id))
-        book.submit_order(Order(10.00, 1, Side.SELL, eve.client_id))
+        t1 = book.submit_order(Order(10.00, 2, Side.BUY, bob.client_id))
+        t2 = book.submit_order(Order(10.00, 1, Side.SELL, alice.client_id))
+        t3 = book.submit_order(Order(10.00, 1, Side.SELL, eve.client_id))
 
         # Check that the orders were matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)
@@ -140,20 +140,20 @@ class TestOrderbook(unittest.TestCase):
         # Check that the fills are correctly recorded
         bob_fill = bob_fills[0]
         alice_fill = alice_fills[0]
-        self.assertEqual(bob_fill['maker'], bob.client_id)
-        self.assertEqual(bob_fill['taker'], alice.client_id)
-        self.assertEqual(bob_fill['size'], 1)
-        self.assertEqual(bob_fill['side'], Side.SELL)
-        self.assertEqual(bob_fill['instrument'], 'ABC')
+        self.assertEqual(bob_fill.maker, bob.client_id)
+        self.assertEqual(bob_fill.taker, alice.client_id)
+        self.assertEqual(bob_fill.size, 1)
+        self.assertEqual(bob_fill.side, Side.SELL)
+        self.assertEqual(bob_fill.instrument, 'ABC')
         self.assertEqual(bob_fill, alice_fill)
 
         bob_fill = bob_fills[1]
         eve_fill = eve_fills[0]
-        self.assertEqual(bob_fill['maker'], bob.client_id)
-        self.assertEqual(bob_fill['taker'], eve.client_id)
-        self.assertEqual(bob_fill['size'], 1)
-        self.assertEqual(bob_fill['side'], Side.SELL)
-        self.assertEqual(bob_fill['instrument'], 'ABC')
+        self.assertEqual(bob_fill.maker, bob.client_id)
+        self.assertEqual(bob_fill.taker, eve.client_id)
+        self.assertEqual(bob_fill.size, 1)
+        self.assertEqual(bob_fill.side, Side.SELL)
+        self.assertEqual(bob_fill.instrument, 'ABC')
         self.assertEqual(bob_fill, eve_fill)
 
     def test_no_matching_orders(self):
@@ -171,7 +171,7 @@ class TestOrderbook(unittest.TestCase):
         book.cancel_order(bob_order.order_id)
         book.submit_order(Order(8.50, 1, Side.SELL, eve.client_id))
 
-        # Check that the orders were matched
+        # Check that the orders weren't matched
         bob_fills = book.get_filled_by_client_id(bob.client_id)
         alice_fills = book.get_filled_by_client_id(alice.client_id)
         eve_fills = book.get_filled_by_client_id(eve.client_id)
@@ -179,3 +179,5 @@ class TestOrderbook(unittest.TestCase):
         self.assertEqual(len(bob_fills), 0)
         self.assertEqual(len(alice_fills), 0)
         self.assertEqual(len(eve_fills), 0)
+
+        self.assertFalse(book.is_matched())
