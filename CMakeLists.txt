@@ -12,6 +12,7 @@ endif()
 
 # Set the compiler
 SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(thirdparty/googletest)
 add_subdirectory(src)
