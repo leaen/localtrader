@@ -1,6 +1,6 @@
 project(localtrader_tests)
 
-SET(TEST_FILES exchange_tests.cpp client_tests.cpp)
+SET(TEST_FILES exchange_tests.cpp client_tests.cpp order_tests.cpp)
 SET(TEST_LIBRARIES exchange)
 
 # Tests executable
