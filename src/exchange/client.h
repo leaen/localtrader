@@ -7,9 +7,12 @@
 namespace exchange {
     class Client {
         public:
-            Client(std::string name);
-            std::vector<const Fill&> get_fills();
-            std::vector<Order&> get_orders();
+            Client(std::string name) : name(name) {};
+            Client(const char* name) : name(name) {};
+
+            std::string get_name();
+        private:
+            std::string name;
     };
 }
 
