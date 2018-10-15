@@ -58,6 +58,7 @@ TEST(OrderTest, can_cancel_order) {
     o.cancel();
 
     ASSERT_EQ(CANCELLED, o.get_status());
+    ASSERT_TRUE(o.is_cancelled());
 }
 
 TEST(OrderTest, can_change_filled_amount) {
@@ -88,5 +89,35 @@ TEST(OrderTest, cant_fill_negative_amount) {
     Order o("ABC", 100.00, 10, BUY, bob);
 
     ASSERT_FALSE(o.fill(-2));
+}
+
+TEST(OrderTest, shows_correct_instrument) {
+    Client bob("bob");
+
+    Order o1("ABC", 100.00, 10, BUY, bob);
+    ASSERT_STREQ("ABC", o1.get_instrument().c_str());
+
+    Order o2("CBA", 100.00, 10, BUY, bob);
+    ASSERT_STREQ("CBA", o2.get_instrument().c_str());
+}
+
+TEST(OrderTest, order_is_buy_is_sell) {
+    Client bob("bob");
+
+    Order o1("ABC", 100.00, 10, BUY, bob);
+    ASSERT_TRUE(o1.is_buy());
+
+    Order o2("CBA", 100.00, 10, SELL, bob);
+    ASSERT_TRUE(o2.is_sell());
+}
+
+TEST(OrderTest, can_get_price) {
+    Client bob("bob");
+
+    Order o1("ABC", 100.00, 10, BUY, bob);
+    ASSERT_EQ(100.00, o1.get_price());
+
+    Order o2("ABC", 19.00, 10, SELL, bob);
+    ASSERT_EQ(19.00, o2.get_price());
 }
 

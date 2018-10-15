@@ -95,4 +95,8 @@ namespace exchange {
         size -= fill_size;
         return true;
     }
+
+    std::string Order::get_instrument() {
+        return instrument;
+    }
 };
