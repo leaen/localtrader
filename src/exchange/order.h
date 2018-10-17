@@ -26,8 +26,8 @@ namespace exchange {
 
             std::string get_instrument();
 
-            bool operator <(const Order& o);
-            bool operator >(const Order& o);
+            bool operator <(const Order& o) const;
+            bool operator >(const Order& o) const;
 
             void set_status(OrderStatus new_status);
             OrderStatus get_status();

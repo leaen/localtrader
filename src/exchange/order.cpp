@@ -14,38 +14,38 @@ namespace exchange {
         order_time = std::chrono::high_resolution_clock::now();
     }
 
-    bool Order::operator <(const Order& o) {
+    bool Order::operator <(const Order& o) const {
         if (side == BUY) {
-            if (price < o.price) {
+            if (price > o.price) {
                 return true;
             }
 
             if (price == o.price) {
                 if (order_time < o.order_time) {
-                    return false;
-                } else {
                     return true;
+                } else {
+                    return false;
                 }
             }
 
-            if (price > o.price) {
+            if (price < o.price) {
                 return false;
             }
 
-        } else {
-            if (price > o.price) {
+        } else if (side == SELL){
+            if (price < o.price) {
                 return true;
             }
 
             if (price == o.price) {
                 if (order_time < o.order_time) {
-                    return false;
-                } else {
                     return true;
+                } else {
+                    return false;
                 }
             }
 
-            if (price < o.price) {
+            if (price > o.price) {
                 return false;
             }
         }
@@ -54,7 +54,7 @@ namespace exchange {
         throw 0;
     }
 
-    bool Order::operator >(const Order& o) { return (*this < o); };
+    bool Order::operator >(const Order& o) const { return (*this < o); };
 
     OrderStatus Order::get_status() {
         return status;

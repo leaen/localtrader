@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <vector>
+
 #include "gtest/gtest.h"
 #include "order.h"
 
@@ -27,14 +30,14 @@ TEST(OrderTest, price_order_respected) {
 
     // Orders to buy with higher prices are more aggresive than orders
     //   with lower prices and should sort larger as a result.
-    ASSERT_TRUE(buy_low < buy_high);
+    ASSERT_LT(buy_high, buy_low);
 
     Order sell_low("ABC", 50.00, 2, SELL, bob);
     Order sell_high("ABC", 55.00, 2, SELL, bob);
 
     // Orders to sell with lower prices are more aggresive than orders
     //   with higher prices and should sort larger as a result.
-    ASSERT_TRUE(sell_high < sell_low);
+    ASSERT_LT(sell_low, sell_high);
 }
 
 TEST(OrderTest, time_order_respected) {
@@ -44,12 +47,12 @@ TEST(OrderTest, time_order_respected) {
 
     // Early orders are more aggresive than late orders and should sort
     //   larger as a result.
-    ASSERT_TRUE(buy_later < buy_early);
+    ASSERT_LT(buy_early, buy_later);
 
     Order sell_early("ABC", 50.00, 2, SELL, bob);
     Order sell_later("ABC", 50.00, 2, SELL, bob);
 
-    ASSERT_TRUE(sell_later < sell_early);
+    ASSERT_LT(sell_early, sell_later);
 }
 
 TEST(OrderTest, can_cancel_order) {
@@ -119,5 +122,28 @@ TEST(OrderTest, can_get_price) {
 
     Order o2("ABC", 19.00, 10, SELL, bob);
     ASSERT_EQ(19.00, o2.get_price());
+}
+
+TEST(OrderTest, can_sort_orders) {
+    Client bob("bob");
+
+    Order o1("ABC", 120.00, 10, BUY, bob);
+    Order o2("ABC", 110.00, 10, BUY, bob);
+    Order o3("ABC", 100.00, 10, BUY, bob);
+    Order o4("ABC", 130.00, 10, BUY, bob);
+
+    std::vector<Order*> buys;
+
+    buys.push_back(&o1);
+    buys.push_back(&o2);
+    buys.push_back(&o3);
+    buys.push_back(&o4);
+
+    std::sort(buys.begin(), buys.end(), [](auto a, auto b) { return *a < *b; });
+
+    ASSERT_EQ(&o4, buys[0]);
+    ASSERT_EQ(&o1, buys[1]);
+    ASSERT_EQ(&o2, buys[2]);
+    ASSERT_EQ(&o3, buys[3]);
 }
 
