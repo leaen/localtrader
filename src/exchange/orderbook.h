@@ -22,6 +22,9 @@ namespace exchange {
 
             double get_best_bid();
             double get_best_offer();
+
+            Order* get_best_buy();
+            Order* get_best_sell();
         private:
             void match_orders(OrderSide side);
             bool is_matched();

@@ -1,5 +1,6 @@
-#include "orderbook.h"
 #include <iostream>
+
+#include "orderbook.h"
 
 namespace exchange {
     std::string Orderbook::get_instrument() {
@@ -41,6 +42,53 @@ namespace exchange {
         }
 
         return bo;
+    }
+
+    bool Orderbook::is_matched() {
+        /*
+         * Returns true when there are matched orders in the book.
+         */
+        return get_best_bid() > get_best_offer();
+    }
+
+    Order* Orderbook::get_best_buy() {
+        /*
+         * Returns a pointer to the most aggressive buy order in the book.
+         */
+
+        Order* best_buy = nullptr;
+        for (auto o : buy_orders) {
+            if (best_buy == nullptr) {
+                best_buy = o;
+                continue;
+            }
+
+            if (*o < *best_buy) {
+                best_buy = o;
+            }
+        }
+
+        return best_buy;
+    }
+
+    Order* Orderbook::get_best_sell() {
+        /*
+         * Returns a pointer to the most aggressive sell order in the book.
+         */
+
+        Order* best_sell = nullptr;
+        for (auto o : sell_orders) {
+            if (best_sell == nullptr) {
+                best_sell = o;
+                continue;
+            }
+
+            if (*o < *best_sell) {
+                best_sell = o;
+            }
+        }
+
+        return best_sell;
     }
 }
 
