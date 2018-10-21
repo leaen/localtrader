@@ -121,8 +121,8 @@ TEST(OrderbookTest, trades_occur) {
     // One trade of 5 units should have occurred at a price of 100.00
     //     upon submitting the sell order
     ASSERT_EQ(1, ob.get_trades()->size());
-    ASSERT_EQ(5, (*ob.get_trades())[0]->get_size());
-    ASSERT_EQ(100.00, (*ob.get_trades())[0]->get_price());
+    ASSERT_EQ(5, ob.get_trades()->at(0)->get_size());
+    ASSERT_EQ(100.0, ob.get_trades()->at(0)->get_price());
 
     // The buy should have 5 units left and the sell should be filled
     ASSERT_EQ(PARTIALLY_FILLED, o1.get_status());
@@ -136,8 +136,8 @@ TEST(OrderbookTest, trades_occur) {
 
     // This should be counted as a second separate trade
     ASSERT_EQ(2, ob.get_trades()->size());
-    ASSERT_EQ(5, (*ob.get_trades())[1]->get_size());
-    ASSERT_EQ(100.0, (*ob.get_trades())[1]->get_price());
+    ASSERT_EQ(5, ob.get_trades()->at(1)->get_size());
+    ASSERT_EQ(100.0, ob.get_trades()->at(1)->get_price());
 
     // Since the buy is fully matched, another sell should not trigger a trade
     Order o4("ABC", 100.00, 5, SELL, alice);
