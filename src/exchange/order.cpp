@@ -93,6 +93,12 @@ namespace exchange {
         }
 
         size -= fill_size;
+        if (size == 0) {
+            status = FILLED;
+        } else {
+            status = PARTIALLY_FILLED;
+        }
+
         return true;
     }
 

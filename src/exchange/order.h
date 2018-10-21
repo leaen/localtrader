@@ -41,6 +41,8 @@ namespace exchange {
             bool is_sell() { return side == SELL; }
 
             double get_price() { return price; }
+            OrderSide get_side() { return side; }
+            Client get_client() { return client; }
         private:
             std::string instrument;
             double price;

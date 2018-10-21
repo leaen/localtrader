@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 
 #include "orderbook.h"
@@ -18,6 +19,8 @@ namespace exchange {
         } else {
             sell_orders.push_back(&o);
         }
+
+        match_orders(o.get_side());
 
         return true;
     }
@@ -48,7 +51,7 @@ namespace exchange {
         /*
          * Returns true when there are matched orders in the book.
          */
-        return get_best_bid() > get_best_offer();
+        return get_best_bid() >= get_best_offer();
     }
 
     Order* Orderbook::get_best_buy() {
@@ -89,6 +92,48 @@ namespace exchange {
         }
 
         return best_sell;
+    }
+
+    void Orderbook::match_orders(OrderSide side) {
+        std::vector<Trade*> new_trades;
+        while (is_matched()) {
+            Order* bb = get_best_buy();
+            Order* bs = get_best_sell();
+
+            int trade_size = std::min(bb->effective_size(), bs->effective_size());
+
+            // Price occurs at the maker order price, so if the new order
+            //     was a buy, then the trade occurs at the price of the sell order
+            //     and vice versa if the taker is a sell order.
+            double trade_price = (side == BUY) ? bs->get_price() : bb->get_price();
+
+            // Maker is the order on the book and taker is the client of the new order.
+            Client maker = (side == BUY) ? bs->get_client() : bb->get_client();
+            Client taker = (side == BUY) ? bb->get_client() : bs->get_client();
+
+            Trade new_t = Trade(instrument, trade_price, trade_size, side,
+                                maker, taker);
+
+            // Register the fill on each order
+            bb->fill(trade_size);
+            bs->fill(trade_size);
+
+            // If orders are filled remove them from the book
+            if (bb->get_status() == FILLED) {
+                buy_orders.erase(
+                    std::find(buy_orders.begin(), buy_orders.end(), bb), buy_orders.end()
+                );
+            }
+
+            if (bs->get_status() == FILLED) {
+                sell_orders.erase(
+                    std::find(sell_orders.begin(), sell_orders.end(), bs), sell_orders.end()
+                );
+            }
+
+            // Record the new trade
+            trades.push_back(&new_t);
+        }
     }
 }
 

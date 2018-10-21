@@ -3,9 +3,11 @@
 
 #include <string>
 #include <chrono>
+#include <vector>
 
 #include "client.h"
 #include "order.h"
+#include "trade.h"
 
 typedef std::chrono::time_point<std::chrono::high_resolution_clock> Timestamp;
 
@@ -24,6 +26,8 @@ namespace exchange {
 
             Order* get_best_buy();
             Order* get_best_sell();
+
+            std::vector<Trade*>* get_trades() { return &trades; }
         private:
             void match_orders(OrderSide side);
             bool is_matched();
@@ -32,6 +36,8 @@ namespace exchange {
 
             std::vector<Order*> buy_orders;
             std::vector<Order*> sell_orders;
+
+            std::vector<Trade*> trades;
     };
 }
 

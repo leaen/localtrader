@@ -104,3 +104,87 @@ TEST(OrderbookTest, can_get_best_sell) {
 
     ASSERT_EQ(&o4, ob.get_best_sell());
 }
+
+TEST(OrderbookTest, trades_occur) {
+    Client bob("bob");
+    Client alice("alice");
+    Order o1("ABC", 100.00, 10, BUY, bob);
+    Order o2("ABC", 100.00, 5, SELL, alice);
+    Orderbook ob("ABC");
+
+    // Initially there should be no trades recorded
+    ASSERT_EQ(0, ob.get_trades()->size());
+
+    ob.submit_order(o1);
+    ob.submit_order(o2);
+
+    // One trade of 5 units should have occurred at a price of 100.00
+    //     upon submitting the sell order
+    ASSERT_EQ(1, ob.get_trades()->size());
+    ASSERT_EQ(5, (*ob.get_trades())[0]->get_size());
+    ASSERT_EQ(100.00, (*ob.get_trades())[0]->get_price());
+
+    // The buy should have 5 units left and the sell should be filled
+    ASSERT_EQ(PARTIALLY_FILLED, o1.get_status());
+    ASSERT_EQ(5, o1.effective_size());
+    ASSERT_EQ(FILLED, o2.get_status());
+
+    // Submitting another sell order should trigger another trade of size 5
+    //     since the buy order was for 10 units
+    Order o3("ABC", 100.00, 5, SELL, alice);
+    ob.submit_order(o3);
+
+    // This should be counted as a second separate trade
+    ASSERT_EQ(2, ob.get_trades()->size());
+    ASSERT_EQ(5, (*ob.get_trades())[1]->get_size());
+    ASSERT_EQ(100.0, (*ob.get_trades())[1]->get_price());
+
+    // Since the buy is fully matched, another sell should not trigger a trade
+    Order o4("ABC", 100.00, 5, SELL, alice);
+    ob.submit_order(o4);
+
+    // No new trades should occur
+    ASSERT_EQ(2, ob.get_trades()->size());
+}
+
+TEST(OrderbookTest, cant_match_cancelled_order) {
+    Client bob("bob");
+    Client alice("alice");
+    Order o1("ABC", 100.00, 10, BUY, bob);
+    Order o2("ABC", 100.00, 5, SELL, alice);
+    Orderbook ob("ABC");
+
+    // Submit then cancel the buy order
+    ob.submit_order(o1);
+    o1.cancel();
+
+    // Submit the sell order
+    ob.submit_order(o2);
+
+    // No trades should occur
+    ASSERT_EQ(0, ob.get_trades()->size());
+}
+
+TEST(OrderbookTest, cant_match_filled_orders) {
+    Client bob("bob");
+    Client alice("alice");
+    Order o1("ABC", 100.00, 5, BUY, bob);
+    Order o2("ABC", 100.00, 5, SELL, alice);
+    Order o3("ABC", 100.00, 5, SELL, alice);
+    Orderbook ob("ABC");
+
+    ob.submit_order(o1);
+    ob.submit_order(o2);
+
+    // Buy and first sell should have matched
+    ASSERT_EQ(1, ob.get_trades()->size());
+    ASSERT_EQ(FILLED, o1.get_status());
+    ASSERT_EQ(FILLED, o2.get_status());
+
+    ob.submit_order(o3);
+
+    // No new trades should occur since the buy order
+    // was fully filled
+    ASSERT_EQ(1, ob.get_trades()->size());
+    ASSERT_EQ(UNFILLED, o3.get_status());
+}
