@@ -147,3 +147,49 @@ TEST(OrderTest, can_sort_orders) {
     ASSERT_EQ(&o3, buys[3]);
 }
 
+TEST(OrderTest, can_serialize_orders) {
+    Client bob("bob");
+    Order o1("ABC", 10.00, 10, BUY, bob);
+    std::string o1_serialized = Order::serialize(o1);
+
+    std::string expected1 = "o|ABC|10.0000|10|BUY|bob";
+    ASSERT_STREQ(expected1.c_str(), o1_serialized.c_str());
+
+    Client alice("alice");
+    Order o2("CBA", 12.333, 432, SELL, alice);
+    std::string o2_serialized = Order::serialize(o2);
+
+    std::string expected2 = "o|CBA|12.3330|432|SELL|alice";
+    ASSERT_STREQ(expected2.c_str(), o2_serialized.c_str());
+}
+
+TEST(OrderTest, can_deserialize_orders) {
+    std::string o1_serialized = "o|ABC|10.0000|10|BUY|bob";
+    bool result1;
+    Order* o1;
+    std::tie(o1, result1) = Order::deserialize(o1_serialized);
+
+    // Check that the deserialization was successful
+    ASSERT_TRUE(result1);
+
+    ASSERT_STREQ("ABC", o1->get_instrument().c_str());
+    ASSERT_EQ(10.00, o1->get_price());
+    ASSERT_EQ(10, o1->get_size());
+    ASSERT_EQ(BUY, o1->get_side());
+    ASSERT_STREQ("bob", o1->get_client().get_name().c_str());
+
+    std::string o2_serialized = "o|CBA|12.3330|432|SELL|alice";
+    bool result2;
+    Order* o2;
+    std::tie(o2, result2) = Order::deserialize(o2_serialized);
+
+    // Check that the deserialization was successful
+    ASSERT_TRUE(result2);
+
+    ASSERT_STREQ("CBA", o2->get_instrument().c_str());
+    ASSERT_EQ(12.333, o2->get_price());
+    ASSERT_EQ(432, o2->get_size());
+    ASSERT_EQ(SELL, o2->get_side());
+    ASSERT_STREQ("alice", o2->get_client().get_name().c_str());
+}
+

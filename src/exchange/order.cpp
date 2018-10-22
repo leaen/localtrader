@@ -1,5 +1,8 @@
 #include <chrono>
+#include <iomanip>
+#include <sstream>
 #include "order.h"
+#include "client.h"
 
 namespace exchange {
     Order::Order(const char* instrument, double price, int size, OrderSide side, Client client)
@@ -104,5 +107,62 @@ namespace exchange {
 
     std::string Order::get_instrument() {
         return instrument;
+    }
+
+    std::string Order::serialize(const Order& o) {
+        std::stringstream ss;
+        ss << 'o' << '|';
+        ss << o.instrument << '|';
+        ss << std::fixed << std::setprecision(4) << o.price << '|';
+        ss << std::setprecision(0) << o.size << '|';
+        ss << (o.side == BUY ? "BUY" : "SELL") << '|';
+        ss << o.get_client().get_name();
+
+        return ss.str();
+    }
+
+    std::pair<Order*, bool> Order::deserialize(const std::string& o_serialized) {
+        std::stringstream ss;
+        ss << o_serialized;
+
+        // Dummy variable to hold pipe separators
+        char sep;
+
+        // Check message type
+        char message_type;
+        ss >> message_type >> sep;
+
+        // The first character in the string should be an 'o' otherwise
+        //     this is not an order or is corrupted in some way
+        if (message_type != 'o') { return {nullptr, false}; }
+
+        std::string instrument;
+        std::getline(ss, instrument, '|');
+
+        double price;
+        ss >> price >> sep;
+
+        int size;
+        ss >> size >> sep;
+
+        std::string order_side;
+        std::getline(ss, order_side, '|');
+        OrderSide side;
+        if (order_side == "BUY") {
+            side = BUY;
+        } else if (order_side == "SELL") {
+            side = SELL;
+        } else {
+            // Unknown order side
+            return {nullptr, false};
+        }
+
+        std::string client_name;
+        std::getline(ss, client_name);
+
+        Client* c = new Client(client_name);
+        Order* o = new Order(instrument.c_str(), price, size, side, *c);
+
+        return {o, true};
     }
 };
