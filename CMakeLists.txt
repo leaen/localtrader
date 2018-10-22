@@ -7,7 +7,7 @@ project(localtrader)
 if (MSVC)
     add_compile_options(/W4 /WX)
 else()
-    add_compile_options(-Wall -Wextra -pedantic -Werror)
+    add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # Set the compiler
