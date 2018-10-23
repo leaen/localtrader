@@ -42,7 +42,12 @@ namespace exchange {
 
             double get_price() { return price; }
             OrderSide get_side() { return side; }
-            Client get_client() { return client; }
+            Client get_client() const { return client; }
+            int get_size() { return size; }
+
+            static std::string serialize(const Order& o);
+            static std::pair<Order*, bool> deserialize(const std::string& o_serialized);
+
         private:
             std::string instrument;
             double price;
