@@ -28,6 +28,8 @@ namespace exchange {
             Order* get_best_sell();
 
             std::vector<Trade*>* get_trades() { return &trades; }
+
+            void set_trade_announcements(bool flag) { trade_announcements = flag; }
         private:
             void match_orders(OrderSide side);
             bool is_matched();
@@ -38,6 +40,8 @@ namespace exchange {
             std::vector<Order*> sell_orders;
 
             std::vector<Trade*> trades;
+
+            bool trade_announcements = false;
     };
 }
 

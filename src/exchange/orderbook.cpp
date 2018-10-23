@@ -131,8 +131,18 @@ namespace exchange {
                 );
             }
 
+            if (trade_announcements) {
+                std::cout << "Trade occurred on " << instrument << " at a price of "
+                          << trade_price << " with size " << trade_size << std::endl;
+
+            }
+
             // Record the new trade
             trades.push_back(&new_t);
+        }
+
+        if (new_trades.size() > 0 && trade_announcements) {
+          std::cout << "Matching finished" << std::endl;
         }
     }
 }

@@ -4,8 +4,13 @@
 #include <chrono>
 #include <thread>
 
+#include <iostream>
+
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+
+#include "order.h"
+#include "orderbook.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -18,12 +23,14 @@ const int PORT = 9000;
 
 class broadcast_server {
 public:
-    broadcast_server() : i(0) {
+    broadcast_server() : i(0), ob("ABC") {
         m_server.init_asio();
 
         m_server.set_open_handler(bind(&broadcast_server::on_open,this,::_1));
         m_server.set_close_handler(bind(&broadcast_server::on_close,this,::_1));
         m_server.set_message_handler(bind(&broadcast_server::on_message,this,::_1,::_2));
+
+        ob.set_trade_announcements(true);
     }
 
     void on_open(connection_hdl hdl) {
@@ -35,7 +42,18 @@ public:
     }
 
     void on_message(connection_hdl hdl, server::message_ptr msg) {
+        exchange::Order* o;
+        bool success;
+
+        std::tie(o, success) = exchange::Order::deserialize(msg->get_payload());
+
+        if (!success) {
+            std::cout << "Failed to decode order " << (msg->get_payload()) << std::endl;
+            return;
+        }
+
         {
+            ob.submit_order(*o);
             std::lock_guard<std::mutex> lock(mu);
             i++;
         }
@@ -65,6 +83,8 @@ private:
 
     int i;
     std::mutex mu;
+
+    exchange::Orderbook ob;
 };
 
 int main() {
