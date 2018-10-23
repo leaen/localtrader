@@ -13,9 +13,8 @@ endif()
 # Boost and pthread
 set(CMAKE_EXE_LINKER_FLAGS "-lboost_system -lpthread")
 
-# Set the compiler
-SET (CMAKE_CXX_COMPILER "/usr/bin/clang++")
-set(CMAKE_CXX_STANDARD 17)
+# Set the standard to C++14
+set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(thirdparty/googletest)
 add_subdirectory(thirdparty/websocketpp)
