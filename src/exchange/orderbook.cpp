@@ -111,8 +111,8 @@ namespace exchange {
             Client maker = (side == BUY) ? bs->get_client() : bb->get_client();
             Client taker = (side == BUY) ? bb->get_client() : bs->get_client();
 
-            Trade new_t = Trade(instrument, trade_price, trade_size, side,
-                                maker, taker);
+            Trade* new_t = new Trade(instrument, trade_price, trade_size, side,
+                                     maker, taker);
 
             // Register the fill on each order
             bb->fill(trade_size);
@@ -138,7 +138,7 @@ namespace exchange {
             }
 
             // Record the new trade
-            trades.push_back(&new_t);
+            trades.push_back(new_t);
         }
 
         if (new_trades.size() > 0 && trade_announcements) {
