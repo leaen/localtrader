@@ -57,7 +57,7 @@ namespace exchange {
         throw 0;
     }
 
-    bool Order::operator >(const Order& o) const { return (*this < o); };
+    bool Order::operator >(const Order& o) const { return (*this < o); }
 
     OrderStatus Order::get_status() {
         return status;
@@ -165,4 +165,5 @@ namespace exchange {
 
         return {o, true};
     }
-};
+}
+

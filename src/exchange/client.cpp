@@ -5,4 +5,4 @@ namespace exchange {
     std::string Client::get_name () {
         return name;
     }
-};
+}
