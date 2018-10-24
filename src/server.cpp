@@ -66,7 +66,11 @@ public:
         m_ss << "The new number is " << i;
 
         for (auto it : m_connections) {
-            m_server.send(it, m_ss.str(), websocketpp::frame::opcode::text);
+            try {
+                m_server.send(it, m_ss.str(), websocketpp::frame::opcode::text);
+            } catch (websocketpp::exception) {
+                std::cerr << "Failed to send sequence update message" << std::endl;
+            }
         }
     }
 
