@@ -42,6 +42,37 @@ public:
     }
 
     void on_message(connection_hdl hdl, server::message_ptr msg) {
+        if (msg->get_payload() == "bb") {
+            double best_bid = ob.get_best_bid();
+
+            std::stringstream m_ss;
+            m_ss << "bb|" << std::fixed << std::setprecision(4) << best_bid;
+
+            m_server.send(hdl, m_ss.str(), websocketpp::frame::opcode::text);
+            return;
+        } else if (msg->get_payload() == "bo") {
+            double best_offer = ob.get_best_offer();
+
+            std::stringstream m_ss;
+            m_ss << "bo|" << std::fixed << std::setprecision(4) << best_offer;
+
+            m_server.send(hdl, m_ss.str(), websocketpp::frame::opcode::text);
+            return;
+        } else if (msg->get_payload() == "bbbo") {
+            double best_bid = ob.get_best_bid();
+            double best_offer = ob.get_best_offer();
+            long long current_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+            std::stringstream m_ss;
+            m_ss << "bbbo" << std::fixed << std::setprecision(4)
+                 << '|' << best_bid
+                 << '|' << best_offer
+                 << '|' << current_ms;
+
+            m_server.send(hdl, m_ss.str(), websocketpp::frame::opcode::text);
+            return;
+        }
+
         exchange::Order* o;
         bool success;
 
