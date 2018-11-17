@@ -1,0 +1,119 @@
+* Exchange API
+** Market activity
+*** Market open
+
+Market open messages are used to signal when the market for a particular instrument opens.
+
+***** Server message section breakdown
+
+| Section      | Value                        |
+|--------------+------------------------------|
+| Message type | ~op~                         |
+| Instrument   | The symbol of the instrument |
+
+***** Example order message
+
+| ~< op|ABC~
+
+The server signals that the market ~ABC~ has opened.
+
+*** Market close
+
+Market close messages are used to signal when the market for a particular instrument closes.
+
+***** Server message section breakdown
+
+| Section      | Value                        |
+|--------------+------------------------------|
+| Message type | ~cl~                         |
+| Instrument   | The symbol of the instrument |
+
+***** Example order message
+
+| ~< cl|ABC~
+
+The server signals that the market ~ABC~ has closed.
+
+** Orders
+*** Submit order
+
+To submit an order to the exchange use a submit order message.
+
+***** Client message section breakdown
+
+| Section      | Value                                          |
+|--------------+------------------------------------------------|
+| Message type | ~o~                                            |
+| Instrument   | The symbol of the instrument in the order      |
+| Price        | The price for the order to 4 decimal places    |
+| Size         | The size of the order                          |
+| Side         | The side of the order, one of ~BUY~ and ~SELL~ |
+| User ID      | Your user ID                                   |
+
+***** Server response section breakdown
+
+| Section      | Value                                                      |
+|--------------+------------------------------------------------------------|
+| Message type | ~o~                                                        |
+| Instrument   | The symbol of the instrument in the order                  |
+| Price        | The price for the order to 4 decimal places                |
+| Size         | The size of the order                                      |
+| Side         | The side of the order, one of ~BUY~ and ~SELL~             |
+| User ID      | Your user ID                                               |
+| Result       | One of ~A~ for accepted orders and ~R~ for rejected orders |
+| Order ID     | A 64-bit integer representing the internal order ID        |
+
+***** Example order message
+ 
+| ~> o|ABC|100.00|50|BUY|bot~
+
+| ~< o|ABC|100.00|50|BUY|bot|A|0001~
+
+~bot~ submits an order to buy 50 units of ABC at a price of 100.00. The exchange responds, accepting the order and giving it an order ID of 0001.
+
+*** Cancel order
+***** Client message section breakdown
+
+| Section      | Value                                                                            |
+|--------------+----------------------------------------------------------------------------------|
+| Message type | ~c~                                                                              |
+| Order ID     | A 64-bit integer representing the internal order ID of the order to be cancelled |
+
+***** Server response section breakdown
+
+| Section      | Value                                                                            |
+|--------------+----------------------------------------------------------------------------------|
+| Message type | ~c~                                                                              |
+| Order ID     | A 64-bit integer representing the internal order ID of the order to be cancelled |
+| Result       | One of ~A~ for accepted cancels and ~R~ for rejected cancels                     |
+ 
+***** Example order cancel message
+
+| ~> c|0001~
+
+| ~< c|0001|A~
+
+~bot~ cancels the order with order ID 0001. The server responds acknowledging the request to cancel the order and accepting the cancel.
+
+** Trades
+*** Trade occurence
+
+A trade occurence message indicates a fill on an order.
+
+***** Server message section breakdown
+
+| Section      | Value                                               |
+|--------------+-----------------------------------------------------|
+| Message type | ~t~                                                 |
+| Instrument   | The symbol of the instrument                        |
+| Price        | The price for the order to 4 decimal places         |
+| Size         | The size of the order                               |
+| Side         | The side of the order, one of ~BUY~ and ~SELL~      |
+| Order ID     | A 64-bit integer representing the internal order ID |
+
+***** Example order cancel message
+
+| ~> t|ABC|100.00|15|BUY|0001~
+
+There was a fill of 15 units on the order with ID 0001 which was to buy ~ABC~ at a price of 100.0.
+
