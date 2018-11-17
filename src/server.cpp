@@ -30,6 +30,11 @@ public:
         m_server.set_close_handler(bind(&broadcast_server::on_close,this,::_1));
         m_server.set_message_handler(bind(&broadcast_server::on_message,this,::_1,::_2));
 
+        auto channels = websocketpp::log::alevel::connect | websocketpp::log::alevel::disconnect;
+
+        m_server.clear_access_channels(websocketpp::log::alevel::all);
+        m_server.set_access_channels(channels);
+
         ob.set_trade_announcements(true);
     }
 
