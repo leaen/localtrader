@@ -132,9 +132,13 @@ namespace exchange {
             }
 
             if (trade_announcements) {
-                std::cout << "Trade occurred on " << instrument << " at a price of "
-                          << trade_price << " with size " << trade_size << std::endl;
-
+                std::cout << taker.get_name()
+                          << ((side == BUY) ? " bought " : " sold ") << "\t"
+                          << trade_size << "\t" << instrument
+                          << ((side == BUY) ? " from " : " to ")
+                          << maker.get_name()
+                          << " at a price of\t" << trade_price
+                          << std::endl;
             }
 
             // Record the new trade
